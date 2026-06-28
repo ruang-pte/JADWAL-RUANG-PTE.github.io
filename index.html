@@ -2,7 +2,6 @@
 <html lang="id">
 
 <head>
-  <base target="_top">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Jadwal Materi Writing</title>
@@ -49,12 +48,27 @@
   </main>
 
   <script>
+
+    const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyOOzlLbHnARf2hOJysUl1ZAYU01hbty1NjIs-MqBzw9HLWoopV8CEdfOj4IQ8MqsGjcg/exec';
+ 
     document.addEventListener('DOMContentLoaded', () => {
-      google.script.run
-        .withSuccessHandler(renderSchedule)
-        .withFailureHandler(showError)
-        .getScheduleData();
+      fetchScheduleData();
     });
+
+    async function fetchScheduleData() {
+      try {
+        const response = await fetch(`${WEB_APP_URL}?format=json`);
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        renderSchedule(data);
+      } catch (error) {
+        showError(error);
+      }
+    }
 
     function renderSchedule(data) {
       const settings = data.settings || {};
@@ -162,14 +176,12 @@
     function platformText(value) {
       if (!value) return '';
 
-      // Tag Font Awesome dengan tambahan class Tailwind untuk warna dan margin
       const discordIcon = '<i class="fa-brands fa-discord text-[#5865F2] mr-2"></i>';
       const meetIcon = '<i class="fa-solid fa-video text-[#feda1e] mr-2"></i>';
       const officeIcon = '<i class="fa-solid fa-building text-gray-600 mr-2"></i>';
       const cafeIcon = '<i class="fa-solid fa-mug-hot text-[#6F4E37] mr-2"></i>';
       const rumahIcon = '<i class="fa-solid fa-house-chimney-user text-gray-600 mr-2"></i>';
 
-      // Simpan hasil toLowerCase agar lebih efisien dan bersih
       const valLower = value.toLowerCase();
 
       const icon = valLower.includes('discord') ? discordIcon
